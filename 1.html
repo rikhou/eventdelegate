@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Delegate</title>
+</head>
+
+<body>
+    <!-- 1. Write some markup -->
+    <ul>
+        <li><button id="b1">Item 1</button></li>
+        <li><button class="b2">Item 2</button></li>
+        <li><button class="b2">Item 3</button></li>
+        <li><button class="b3">Item 4</button></li>
+        <li><button>Item 5</button></li>
+    </ul>
+
+    <script>
+        function delegate(element, selector, type, callback, useCapture) {
+            var listenerFn = listener(element, selector, type, callback);
+            element.addEventListener(type, listenerFn, useCapture);
+
+            return {
+                destroy: function () {
+                    element.removeEventListener(type, listenerFn, useCapture);
+                }
+            }
+        }
+
+        function listener(element, selector, type, callback) {
+            return function (e) {
+                e.delegateTarget = matches(e.target, selector);
+                if (e.delegateTarget) {
+                    callback.call(element, e);
+                }
+            }
+        }
+
+        function matches(element, selector) {
+            while (element && element.nodeType !== 9) {
+                if (typeof element.matches === 'function' && element.matches(selector)) {
+                    return element;
+                }
+                element = element.parentNode;
+            }
+        }
+
+
+    </script>
+    <script>
+        var ul = document.querySelector('ul');
+
+        var delegate = delegate(ul, 'button', 'click', function (e) {
+            console.log(e.target);
+        });
+
+        // delegate.destroy();
+
+
+    </script>
+</body>
+
+</html>
